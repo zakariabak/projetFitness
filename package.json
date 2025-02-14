@@ -1,0 +1,23 @@
+{
+  "name": "serveur",
+  "version": "1.0.0",
+  "description": "Serveur de l'équipe 07",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "build": "tsc --project ./"
+  },
+  "author": "Zakaria Bakkouri",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "hbs": "^4.2.0",
+    "mongodb": "^6.13.0",
+    "mongoose": "^8.9.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  }
+}
