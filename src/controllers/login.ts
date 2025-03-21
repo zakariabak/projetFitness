@@ -1,4 +1,54 @@
 import { Request, Response, NextFunction } from 'express';
+import { users } from '../data/users';
+
+export const login = (req: Request, res: Response, next: NextFunction): void => {
+    const { email, motDePasse } = req.body;
+
+    console.log('Données reçues dans /login :', req.body);
+
+    // Vérifie que tous les champs sont présents
+    if (!email || !motDePasse) {
+        res.status(400).json({
+            message: 'Email et mot de passe sont requis'
+        });
+        return;
+    }
+
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+        res.status(404).json({
+            message: 'Utilisateur non trouvé ❌'
+        });
+        return;
+    }
+
+    if (user.motDePasse !== motDePasse) {
+        res.status(401).json({
+            message: 'Mot de passe incorrect ❌'
+        });
+        return;
+    }
+
+    console.log('Utilisateur connecté avec succès ✅');
+
+    // Renvoie toutes les infos utiles (sans le mot de passe)
+    res.status(200).json({
+        message: 'Connexion réussie ✅',
+        user: {
+            _id: user._id,
+            nom: user.nom,
+            nomFamille: user.nomFamille,
+            username: user.username,
+            email: user.email,
+            poids: user.poids,
+            taille: user.taille,
+            sexe: user.sexe,
+            dispo: user.dispo
+        }
+    });
+};
+/*import { Request, Response, NextFunction } from 'express';
 import { users } from '../data/users'; // ⚠️ importe ton tableau users
 
 export const login = (req: Request, res: Response, next: NextFunction): void => {
@@ -42,15 +92,5 @@ export const login = (req: Request, res: Response, next: NextFunction): void => 
   });
 };
 
+*/
 
-
-
-/* import { NextFunction, Request, Response } from 'express';
-
-export const login = async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body);
-
-  res.status(200).json({
-    message: 'Login OK'
-  });
-}; */

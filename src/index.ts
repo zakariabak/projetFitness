@@ -36,7 +36,7 @@ server.listen(PORT, () => {
 
 
 import express from 'express';
-import userRoutes from './routes/user'; // ajuste si le chemin est différent
+import userRoutes from './routes/userRoutes'; // ajuste si le chemin est différent
 import http from 'http';
 
 const NAMESPACE = 'Index';
