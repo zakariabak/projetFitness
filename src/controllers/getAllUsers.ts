@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { users } from '../data/users';
 
-// ✅ PAS DE RETOUR ! Juste une fonction classique.
+
 export const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!users.length) {
       res.status(404).json({
         message: "Aucun utilisateur inscrit pour le moment."
       });
-      return; // ✅ pour éviter de continuer après
+      return; 
     }
 
     res.status(200).json({

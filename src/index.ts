@@ -2,10 +2,14 @@ import express from 'express';
 import userRoutes from './routes/userRoutes';
 import http from 'http';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+dotenv.config()
 
 const NAMESPACE = 'Index';
 const PORT = 4200;
-const MONGO_URI = 'mongodb://localhost:27017/fit4life';
+//const MONGO_URI = 'mongodb://localhost:27017/fit4life';
+const MONGO_URI = process.env.MONGODB_URI!;
+
 
 const app = express();
 

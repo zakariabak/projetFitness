@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/User'; // ➡️ Modèle Mongoose
+import User from '../models/user'; 
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { nom, nomFamille, username, email, motDePasse } = req.body;
 
-    // ➡️ Vérifie que tous les champs sont présents
+    
     if (!nom || !nomFamille || !username || !email || !motDePasse) {
         res.status(400).json({
             message: 'Tous les champs sont requis : nom, nomFamille, username, email et motDePasse'
@@ -13,7 +13,6 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     }
 
     try {
-        // ➡️ Vérifie si l'utilisateur existe déjà
         const existingUser = await User.findOne({
             $or: [
                 { email: email },
@@ -28,25 +27,22 @@ export const register = async (req: Request, res: Response, next: NextFunction):
             return;
         }
 
-        // ➡️ Crée un nouvel utilisateur avec Mongoose
         const newUser = new User({
             nom,
             nomFamille,
             username,
             email,
-            motDePasse,  // ⚠️ En clair pour l'instant, à sécuriser plus tard
+            motDePasse,  
             poids: null,
             taille: null,
             sexe: null,
             dispo: null
         });
 
-        // ➡️ Sauvegarde en base de données MongoDB
         const savedUser = await newUser.save();
 
         console.log('✅ Nouvel utilisateur enregistré :', savedUser);
 
-        // ➡️ Réponse sans le mot de passe
         res.status(201).json({
             message: 'Utilisateur enregistré avec succès ✅',
             user: {

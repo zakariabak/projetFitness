@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/User'; // On utilise le modèle mongoose
+import User from '../models/user'; 
 
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, motDePasse } = req.body;
 
     console.log('Données reçues dans /login :', req.body);
 
-    // ➡️ Vérifie que tous les champs sont présents
+    
     if (!email || !motDePasse) {
         res.status(400).json({
             message: 'Email et mot de passe sont requis'
@@ -15,7 +15,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     }
 
     try {
-        // ➡️ Recherche de l'utilisateur dans MongoDB
         const user = await User.findOne({ email });
 
         if (!user) {
@@ -25,7 +24,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
             return;
         }
 
-        // ➡️ Vérification du mot de passe (en clair pour l'instant)
         if (user.motDePasse !== motDePasse) {
             res.status(401).json({
                 message: 'Mot de passe incorrect ❌'
@@ -35,7 +33,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
         console.log(`✅ Utilisateur connecté : ${user.username}`);
 
-        // ➡️ Renvoie toutes les infos utiles (sans le mot de passe)
         res.status(200).json({
             message: 'Connexion réussie ✅',
             user: {

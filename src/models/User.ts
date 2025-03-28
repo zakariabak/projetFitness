@@ -1,46 +1,9 @@
-/* interface User {
-    nom: string;
-    nomFamille: string;
-    username: string;
-    email: string;
-    poids: number;
-    taille: number;
-    sexe: string;
-    dispos: string[];
-  } */
 
-  // Simple type user pour simulation
-/* export interface IUser {
-  _id: string;
-  nom: string;
-  nomFamille: string;
-  username: string;
-  email: string;
-  motDePasse: string; // ⚠️ hashé normalement, mais là on fait simple
-  poids?: number;
-  taille?: number;
-  sexe?: string;
-  dispo?: string;
-  
-}
+import mongoose, { Schema } from 'mongoose';
+import { IUser } from '../common/IUser';
 
-*/
-
-import mongoose, { Schema, Document } from 'mongoose';
-
-export interface IUser extends Document {
-    nom: string;
-    nomFamille: string;
-    username: string;
-    email: string;
-    motDePasse: string;
-    poids?: number;
-    taille?: number;
-    sexe?: string;
-    dispo?: string;
-}
-
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema<IUser> = new Schema(
+  {
     nom: { type: String, required: true },
     nomFamille: { type: String, required: true },
     username: { type: String, required: true, unique: true },
@@ -50,8 +13,17 @@ const UserSchema: Schema = new Schema({
     taille: { type: Number, default: null },
     sexe: { type: String, default: null },
     dispo: { type: String, default: null },
-}, {
+    objectif: { type: String, default: null },
+    poidsObjectif: { type: String, default: null },
+    experience: { type: String, default: null },
+    entrainement: { type: String, default: null },
+    frequence: { type: String, default: null },
+    planNutrition: { type: String, default: null },
+    budget: { type: String, default: null }
+  },
+  {
     timestamps: true
-});
+  }
+);
 
 export default mongoose.model<IUser>('User', UserSchema);
