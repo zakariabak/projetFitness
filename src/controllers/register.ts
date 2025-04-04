@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/user'; 
+import User from '../models/User'; 
 
 export const register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { nom, nomFamille, username, email, motDePasse } = req.body;

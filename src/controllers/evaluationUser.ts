@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import User from '../models/user';
+import User from '../models/User';
 
 export const evaluationUser = async (req: Request, res: Response): Promise<void> => {
     const userId = req.params.id;
