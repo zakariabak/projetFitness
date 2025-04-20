@@ -8,7 +8,7 @@ const ExerciceSchema = new Schema({
 });
 
 const EntrainementMusculationSchema = new Schema({
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // ✅ Utilise Schema.Types.ObjectId
+  userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, 
   nom: { type: String, required: true },
   exercices: { type: [ExerciceSchema], default: [] },
   createdAt: { type: Date, default: Date.now }

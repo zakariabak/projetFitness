@@ -12,13 +12,13 @@ export const getAllUsers = (req: Request, res: Response, next: NextFunction) => 
     }
 
     res.status(200).json({
-      message: "Liste des utilisateurs récupérée avec succès ✅",
+      message: "Liste des utilisateurs récupérée avec succès ",
       count: users.length,
       data: users
     });
   } catch (error) {
     res.status(500).json({
-      message: "Erreur lors de la récupération des utilisateurs ❌",
+      message: "Erreur lors de la récupération des utilisateurs ",
       error
     });
   }
