@@ -5,6 +5,7 @@ import User from '../models/User';
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { email, motDePasse } = req.body;
 
+    console.log("ok")
     console.log('Données reçues dans /login :', req.body);
 
     if (!email || !motDePasse) {
@@ -40,9 +41,10 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
             { expiresIn: '24h' }              
         );
 
+        console.log(user)
         res.status(200).json({
             message: 'Connexion réussie ✅',
-            token, // 🔥 renvoie le token ici
+            token, 
             user: {
                 _id: user._id,
                 nom: user.nom,
@@ -52,7 +54,14 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
                 poids: user.poids,
                 taille: user.taille,
                 sexe: user.sexe,
-                dispo: user.dispo
+                dispo: user.dispo,
+                objectif: user.objectif,
+                poidsObjectif: user.poidsObjectif,
+                experience: user.experience,
+                entrainement: user.entrainement,
+                frequence: user.frequence,
+                planNutrition: user.planNutrition,
+                budget: user.budget,
             }
         });
 
