@@ -37,7 +37,7 @@ app.use((req, res, next) => {
 
 mongoose.connect(MONGO_URI)
     .then(() => {
-        console.log('✅ Connexion à MongoDB réussie');
+        console.log(' Connexion à MongoDB réussie');
 
         const server = http.createServer(app);
 
@@ -46,5 +46,5 @@ mongoose.connect(MONGO_URI)
         });
     })
     .catch(err => {
-        console.error('❌ Erreur MongoDB :', err);
+        console.error(' Erreur MongoDB :', err);
     });

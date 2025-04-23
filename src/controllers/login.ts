@@ -32,9 +32,9 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
             return;
         }
 
-        console.log(`✅ Utilisateur connecté : ${user.username}`);
+        console.log(` Utilisateur connecté : ${user.username}`);
 
-        // ✅ Création du token JWT
+        // Création du token JWT
         const token = jwt.sign(
             { id: user._id, email: user.email }, 
             process.env.JWT_SECRET!,            
@@ -43,7 +43,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
         console.log(user)
         res.status(200).json({
-            message: 'Connexion réussie ✅',
+            message: 'Connexion réussie ',
             token, 
             user: {
                 _id: user._id,
@@ -62,6 +62,9 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
                 frequence: user.frequence,
                 planNutrition: user.planNutrition,
                 budget: user.budget,
+
+               // age: user.age,
+                //niveauActivite: user.niveauActivite,
             }
         });
 

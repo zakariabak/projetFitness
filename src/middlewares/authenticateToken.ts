@@ -7,7 +7,7 @@ export const authenticateToken: RequestHandler = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ message: 'Token manquant ❌' });
+    res.status(401).json({ message: 'Token manquant' });
     return;
   }
 
@@ -19,6 +19,6 @@ export const authenticateToken: RequestHandler = (req, res, next) => {
 
     next(); 
   } catch (err) {
-    res.status(403).json({ message: 'Token invalide ❌' });
+    res.status(403).json({ message: 'Token invalide' });
   }
 };

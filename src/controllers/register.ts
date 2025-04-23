@@ -55,7 +55,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
         });
 
     } catch (error) {
-        console.error('❌ Erreur Register :', error);
+        console.error('Erreur Register :', error);
         res.status(500).json({ message: 'Erreur serveur lors de l\'inscription.' });
     }
 };

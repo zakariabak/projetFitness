@@ -19,7 +19,19 @@ const UserSchema: Schema<IUser> = new Schema(
     entrainement: { type: String, default: null },
     frequence: { type: String, default: null },
     planNutrition: { type: String, default: null },
-    budget: { type: String, default: null }
+    budget: { type: String, default: null },
+
+    age: { type: Number, default: null },
+    niveauActivite: { type: Number, default: null },
+
+    calories: { type: Number, default: null },
+proteines: { type: Number, default: null },
+lipides: { type: Number, default: null },
+glucides: { type: Number, default: null },
+imc: { type: Number, default: null },
+
+
+
   },
   {
     timestamps: true
