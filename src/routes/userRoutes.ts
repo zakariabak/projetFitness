@@ -10,6 +10,9 @@ import { authenticateToken } from '../middlewares/authenticateToken';
 import { enregistrerSuivi } from '../controllers/enregistrerSuivi';
 import { getSuivisUser } from '../controllers/getSuivisUser';
 import { deleteSuivi } from '../controllers/deleteSuivi';
+import { getAllExercices } from '../controllers/getAllExercices';
+import { getProgressionParExercice } from '../controllers/getProgressionParExercice';
+
 const router = express.Router();
 
 router.post('/register', register);
@@ -19,6 +22,7 @@ router.post('/suivi', authenticateToken, enregistrerSuivi);
 
 router.get('/all', getAllUsers);
 router.get('/suivi', authenticateToken, getSuivisUser);
+router.get('/exercices', getAllExercices); 
 router.delete('/suivi/:id', authenticateToken, deleteSuivi);
 
 
@@ -27,6 +31,7 @@ router.delete('/suivi/:id', authenticateToken, deleteSuivi);
 router.post('/entrainement', authenticateToken, creerEntrainement);
 router.get('/entrainement', authenticateToken, getEntrainementUser);
 router.delete('/entrainement/:id', authenticateToken, deleteEntrainement);
+router.get('/suivi/performance/:nomExercice', authenticateToken, getProgressionParExercice);
 
 
 export default router;

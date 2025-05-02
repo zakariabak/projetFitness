@@ -47,9 +47,9 @@ export const enregistrerSuivi = async (req: AuthRequest, res: Response): Promise
 
     const saved = await suivi.save();
 
-    res.status(201).json({ message: '✅ Suivi enregistré', suivi: saved });
+    res.status(201).json({ message: 'Suivi enregistré', suivi: saved });
   } catch (error) {
-    console.error('❌ Erreur dans enregistrerSuivi :', error);
+    console.error('Erreur dans enregistrerSuivi :', error);
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };

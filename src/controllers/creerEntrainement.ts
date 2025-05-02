@@ -39,7 +39,7 @@ export const creerEntrainement = async (
     const saved = await nouvelEntrainement.save();
     res.status(201).json({ message: '✅ Entrainement enregistré', entrainement: saved });
   } catch (error) {
-    console.error('❌ Erreur dans creerEntrainement :', error);
+    console.error(' Erreur dans creerEntrainement :', error);
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };

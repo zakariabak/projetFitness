@@ -3,8 +3,10 @@ import userRoutes from './routes/userRoutes';
 import http from 'http';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { seedExercices } from './data/exercices';
 dotenv.config()
 
+seedExercices();
 const NAMESPACE = 'Index';
 const PORT = 4201;
 const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fit4life';

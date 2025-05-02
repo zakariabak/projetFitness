@@ -17,8 +17,6 @@ export interface IUser extends Document {
     experience?: string;
     entrainement?: string;
     frequence?: string;
-    planNutrition?: string;
-    budget?: string;
 
 
     //ajout

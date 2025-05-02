@@ -18,8 +18,6 @@ const UserSchema: Schema<IUser> = new Schema(
     experience: { type: String, default: null },
     entrainement: { type: String, default: null },
     frequence: { type: String, default: null },
-    planNutrition: { type: String, default: null },
-    budget: { type: String, default: null },
 
     age: { type: Number, default: null },
     niveauActivite: { type: Number, default: null },
