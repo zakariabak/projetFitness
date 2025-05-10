@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import EntrainementMusculation from '../models/EntrainementMusculation';
-
+import { IExercice } from '../common/IEntrainementMusculation';
 interface EntrainementBody {
   nom: string;
-  exercices: { nom: string; series: number; repetitions: number }[];
+  exercices: IExercice[];
 }
-
 interface AuthRequest extends Request {
   user?: { id: string };
   body: EntrainementBody;

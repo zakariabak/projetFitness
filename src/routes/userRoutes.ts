@@ -12,7 +12,8 @@ import { getSuivisUser } from '../controllers/getSuivisUser';
 import { deleteSuivi } from '../controllers/deleteSuivi';
 import { getAllExercices } from '../controllers/getAllExercices';
 import { getProgressionParExercice } from '../controllers/getProgressionParExercice';
-
+import { modifierEntrainement } from '../controllers/modifierEntrainement';
+import { genererEntrainementIA } from '../controllers/genererEntrainementIA';
 const router = express.Router();
 
 router.post('/register', register);
@@ -24,12 +25,12 @@ router.get('/all', getAllUsers);
 router.get('/suivi', authenticateToken, getSuivisUser);
 router.get('/exercices', getAllExercices); 
 router.delete('/suivi/:id', authenticateToken, deleteSuivi);
-
-
+router.post('/generer-entrainement',authenticateToken, genererEntrainementIA);
 
 // Routes protégées par token
 router.post('/entrainement', authenticateToken, creerEntrainement);
 router.get('/entrainement', authenticateToken, getEntrainementUser);
+router.put('/entrainement/:id', authenticateToken, modifierEntrainement);
 router.delete('/entrainement/:id', authenticateToken, deleteEntrainement);
 router.get('/suivi/performance/:nomExercice', authenticateToken, getProgressionParExercice);
 
