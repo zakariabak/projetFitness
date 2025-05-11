@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import EntrainementMusculation from '../models/EntrainementMusculation';
-
+import { IExercice } from '../common/IEntrainementMusculation';
 interface EntrainementBody {
   nom: string;
-  exercices: { nom: string; series: number; repetitions: number }[];
+  exercices: IExercice[];
 }
-
 interface AuthRequest extends Request {
   user?: { id: string };
   body: EntrainementBody;
@@ -39,7 +38,7 @@ export const creerEntrainement = async (
     const saved = await nouvelEntrainement.save();
     res.status(201).json({ message: '✅ Entrainement enregistré', entrainement: saved });
   } catch (error) {
-    console.error('❌ Erreur dans creerEntrainement :', error);
+    console.error(' Erreur dans creerEntrainement :', error);
     res.status(500).json({ message: 'Erreur serveur', error });
   }
 };

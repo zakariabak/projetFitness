@@ -60,8 +60,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
                 experience: user.experience,
                 entrainement: user.entrainement,
                 frequence: user.frequence,
-                planNutrition: user.planNutrition,
-                budget: user.budget,
 
                // age: user.age,
                 //niveauActivite: user.niveauActivite,
