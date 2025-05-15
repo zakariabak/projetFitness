@@ -28,7 +28,15 @@ lipides: { type: Number, default: null },
 glucides: { type: Number, default: null },
 imc: { type: Number, default: null },
 
-
+poidsHistorique: {
+  type: [
+    {
+      poids: { type: Number, required: true },
+      date: { type: Date, required: true }
+    }
+  ],
+  default: []
+}
 
   },
   {

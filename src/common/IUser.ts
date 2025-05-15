@@ -25,11 +25,15 @@ export interface IUser extends Document {
 
     //nutrition
     calories?: number;
-proteines?: number;
-lipides?: number;
-glucides?: number;
-imc?: number;
+    proteines?: number;
+    lipides?: number;
+    glucides?: number;
+    imc?: number;
 
+     poidsHistorique?: {
+        poids: number;
+        date: Date;
+    }[];
 
 }
 

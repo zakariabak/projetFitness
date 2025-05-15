@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
 import { IUser } from '../common/IUser';
-
 import express from 'express';
-const app = express();
-app.use(express.json());
+
 
 interface AuthRequest extends Request {
   user?: { id: string };
@@ -14,7 +12,7 @@ const allowedFields = [
   "nom", "nomFamille", "username", "email", "motDePasse", "poids", "taille",
   "sexe", "dispo", "objectif", "poidsObjectif", "experience", "entrainement",
   "frequence", "planNutrition", "budget", "age", "niveauActivite",
-  "calories", "proteines", "lipides", "glucides", "imc"
+  
 ];
 
 export const updateUserField = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {

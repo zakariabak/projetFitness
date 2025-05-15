@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import EntrainementMusculation from '../models/EntrainementMusculation';
 import { IExercice } from '../common/IEntrainementMusculation';
+
 interface EntrainementBody {
   nom: string;
   exercices: IExercice[];

@@ -60,9 +60,13 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
                 experience: user.experience,
                 entrainement: user.entrainement,
                 frequence: user.frequence,
-
-               // age: user.age,
-                //niveauActivite: user.niveauActivite,
+                age: user.age,
+                niveauActivite: user.niveauActivite,
+                calories: user.calories,
+                proteines: user.proteines,
+                lipides: user.lipides,
+                glucides: user.glucides,
+                imc: user.imc,
             }
         });
 
