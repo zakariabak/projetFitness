@@ -32,7 +32,7 @@ export const getProgressionParExercice = async (req: AuthRequest, res: Response)
       const moyenne = charges.reduce((sum, val) => sum + val, 0) / charges.length;
       return {
         date,
-        charge: parseFloat(moyenne.toFixed(2))  // tu peux garder 2 décimales par clarté
+        charge: parseFloat(moyenne.toFixed(2))  
       };
     });
 

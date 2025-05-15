@@ -179,7 +179,7 @@ export async function seedExercices() {
 
     console.log("Exercices ajoutés à la base");
   } catch (error) {
-    console.error("❌ Erreur lors du seed des exercices:", error);
+    console.error(" Erreur lors du seed des exercices:", error);
   }
 }
 export { Exercice };
