@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
-import { calculCalories, calculIMC, calculMacros } from '../models/utilitaires/calculs';
-
-
+import {
+  calculCalories,
+  calculIMC,
+  calculMacros,
+  estimationDateObjectif
+} from '../models/utilitaires/calculs';
 
 export const evaluationUser = async (req: Request, res: Response): Promise<void> => {
   console.log("PUT /evaluation/:id appelé !");
@@ -19,7 +22,6 @@ export const evaluationUser = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-
     const champsEvaluation = {
       objectif: updates.objectif,
       experience: updates.experience,
@@ -33,23 +35,17 @@ export const evaluationUser = async (req: Request, res: Response): Promise<void>
       age: updates.age,
       poidsObjectif: updates.poidsObjectif
     };
-
-
     for (const [key, value] of Object.entries(champsEvaluation)) {
       if (value !== undefined && value !== null) {
         existingUser[key] = value;
       }
     }
 
-
-
-    const poids = parseInt(updates.poids);
+const poids = parseInt(updates.poids);
     if (isNaN(poids)) {
       res.status(400).json({ error: "Le poids est requis et doit être un nombre." });
       return;
     }
-
-    
 
     const { taille, age, sexe, niveauActivite, objectif } = existingUser;
     if (!taille || !age || !sexe || !niveauActivite || !objectif) {
@@ -57,19 +53,12 @@ export const evaluationUser = async (req: Request, res: Response): Promise<void>
       return;
     }
 
+    
     const calories = calculCalories(poids, taille, age, sexe, niveauActivite, objectif);
     const imc = calculIMC(poids, taille);
     const { proteines, lipides, glucides } = calculMacros(poids, calories);
-  
-
-    updates.calories = calories;
 
     
-    updates.imc = imc;
-    updates.proteines = proteines;
-    updates.lipides = lipides;
-    updates.glucides = glucides;
-
     const toLocalDateOnly = (d: Date) => d.toLocaleDateString('fr-CA'); // format YYYY-MM-DD
     const date = updates.date ? new Date(updates.date) : new Date();
     const dateFormatee = toLocalDateOnly(date);
@@ -78,21 +67,15 @@ export const evaluationUser = async (req: Request, res: Response): Promise<void>
     if (!existingUser.poidsHistorique) {
       existingUser.poidsHistorique = [];
     }
-
-    // Supprimer l'ancien poids pour cette date (s'il existe déjà)
     existingUser.poidsHistorique = existingUser.poidsHistorique.filter(entry =>
       toLocalDateOnly(new Date(entry.date)) !== dateFormatee
     );
-
-    // Ajouter le nouveau poids
     existingUser.poidsHistorique.push({ poids, date });
 
-    // ✅ Mettre à jour le poids *actuel* uniquement si c'est pour aujourd'hui
     if (dateFormatee === aujourdHui) {
       existingUser.poids = poids;
     }
 
-    // Mise à jour du poids + stats
     existingUser.imc = imc;
     existingUser.calories = calories;
     existingUser.proteines = proteines;
@@ -100,14 +83,54 @@ export const evaluationUser = async (req: Request, res: Response): Promise<void>
     existingUser.glucides = glucides;
 
 
+    let projection = null;
+    const objectifNum = Number(existingUser.poidsObjectif);
+    if (
+      existingUser.poidsHistorique &&
+      Array.isArray(existingUser.poidsHistorique) &&
+      existingUser.poidsHistorique.length >= 2 &&
+      !isNaN(objectifNum)
+    ) {
+      projection = estimationDateObjectif(existingUser.poidsHistorique, objectifNum);
+    }
+
     console.log("Utilisateur final :", existingUser.toObject());
     await existingUser.save();
 
+    const userObj = {
+      _id: existingUser._id,
+      nom: existingUser.nom,
+      nomFamille: existingUser.nomFamille,
+      username: existingUser.username,
+      email: existingUser.email,
+      poids: existingUser.poids,
+      taille: existingUser.taille,
+      sexe: existingUser.sexe,
+      dispo: existingUser.dispo,
+      objectif: existingUser.objectif,
+      poidsObjectif: existingUser.poidsObjectif,
+      experience: existingUser.experience,
+      entrainement: existingUser.entrainement,
+      frequence: existingUser.frequence,
+      age: existingUser.age,
+      niveauActivite: existingUser.niveauActivite,
+      calories: existingUser.calories,
+      proteines: existingUser.proteines,
+      lipides: existingUser.lipides,
+      glucides: existingUser.glucides,
+      imc: existingUser.imc,
+      poidsHistorique: existingUser.poidsHistorique || [],
+      dateEstimeeObjectif: projection?.dateEstimee ?? null,
+      pentePoids: projection?.details?.a ?? null,
+      nbJoursRestant: projection?.details?.xObjectif ?? null
+    };
+
     res.status(200).json({
       message: 'Utilisateur mis à jour avec succès après évaluation',
-      user: existingUser,
+      user: userObj,
       calories
     });
+
   } catch (error) {
     console.error('Erreur dans evaluationUser:', error);
     console.error(error.stack);

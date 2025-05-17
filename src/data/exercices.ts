@@ -46,6 +46,7 @@ export async function seedExercices() {
 { nom: 'Leg curl allongé', groupeMusculaire: 'Jambes' },
 { nom: 'Leg curl assis', groupeMusculaire: 'Jambes' },
 { nom: 'Leg curl debout unilatéral', groupeMusculaire: 'Jambes' },
+{ nom: 'Soulevé de terre à la barre', groupeMusculaire: 'Jambes' },
 { nom: 'Soulevé de terre jambes tendues avec haltères', groupeMusculaire: 'Jambes' },
 { nom: 'Soulevé de terre jambes tendues à la barre', groupeMusculaire: 'Jambes' },
 { nom: 'Soulevé de terre jambes tendues à la Smith machine', groupeMusculaire: 'Jambes' },

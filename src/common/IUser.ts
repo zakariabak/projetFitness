@@ -19,11 +19,10 @@ export interface IUser extends Document {
     frequence?: string;
 
 
-    //ajout
     age?: number; 
-    niveauActivite?: number; // 1.2 à 2.5 ou MET moyen
+    niveauActivite?: number; 
 
-    //nutrition
+ 
     calories?: number;
     proteines?: number;
     lipides?: number;
@@ -31,8 +30,10 @@ export interface IUser extends Document {
     imc?: number;
 
      poidsHistorique?: {
+        _id?: string;
         poids: number;
         date: Date;
+        
     }[];
 
 }

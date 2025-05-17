@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
 import SuiviMusculation from '../models/SuiviMusculation';
+import { calc1RM, recordAbsolu1RM, dernier1RM } from '../models/utilitaires/calculs';
 
 interface AuthRequest extends Request {
   user?: { id: string };
 }
+
 export const getProgressionParExercice = async (req: AuthRequest, res: Response) => {
   const { nomExercice } = req.params;
 
@@ -13,32 +15,40 @@ export const getProgressionParExercice = async (req: AuthRequest, res: Response)
       "exercices.nom": nomExercice
     }).sort({ date: 1 });
 
-    const chargeParDate = new Map<string, number[]>();
-
-    suivis.forEach(suivi => {
+    const progression = suivis.map(suivi => {
       const date = new Date(suivi.date).toISOString().split('T')[0];
       const exercice = suivi.exercices.find(e => e.nom === nomExercice);
 
-      if (exercice) {
-        const charges = exercice.series.map(serie => serie.charge).filter(c => !isNaN(c));
-        if (!chargeParDate.has(date)) {
-          chargeParDate.set(date, []);
-        }
-        chargeParDate.get(date)?.push(...charges);
-      }
-    });
+      if (!exercice) return null;
 
-    const historique = Array.from(chargeParDate.entries()).map(([date, charges]) => {
-      const moyenne = charges.reduce((sum, val) => sum + val, 0) / charges.length;
+      const series = exercice.series.map(serie => ({
+        charge: serie.charge,
+        repetitions: serie.repetitions
+      }));
+
+      const moyenne = series.length > 0
+        ? (series.reduce((sum, s) => sum + s.charge, 0) / series.length)
+        : null;
+
+      const best1RM = series.length > 0
+        ? Math.max(...series.map(s => calc1RM(s.charge, s.repetitions)))
+        : null;
+
       return {
         date,
-        charge: parseFloat(moyenne.toFixed(2))  
+        chargeMoyenne: moyenne !== null ? parseFloat(moyenne.toFixed(2)) : null,
+        series 
       };
-    });
+    }).filter(Boolean);
+
+    const record = recordAbsolu1RM(suivis, nomExercice);
+    const last = dernier1RM(suivis, nomExercice);
 
     res.status(200).json({
       exercice: nomExercice,
-      historique
+      progression,             
+      recordAbsolu1RM: record, 
+      dernier1RM: last         
     });
 
   } catch (error) {
@@ -46,4 +56,3 @@ export const getProgressionParExercice = async (req: AuthRequest, res: Response)
     res.status(500).json({ message: "Erreur serveur", error });
   }
 };
-
