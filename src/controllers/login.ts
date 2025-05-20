@@ -65,6 +65,8 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       nbJoursRestant: projection?.details?.xObjectif ?? null
     };
 
+    console.log("🔐 TOKEN DEV :", token);
+
     res.status(200).json({
       message: 'Connexion réussie',
       token,

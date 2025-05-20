@@ -17,6 +17,13 @@ import { getProgressionParExercice } from '../controllers/getProgressionParExerc
 import { modifierEntrainement } from '../controllers/modifierEntrainement';
 import { getRecords1RM } from '../controllers/getRecords1RM';
 import { genererEntrainementIA } from '../controllers/genererEntrainementIA';
+import { creerRepas } from '../controllers/repasController';
+import { getRepasUtilisateur } from '../controllers/repasController';
+import { supprimerRepas } from '../controllers/repasController';
+import { getJournee, upsertJournee } from '../controllers/journeeController'
+import { getJourneesDeSemaine } from "../controllers/journeeController";
+
+
 const router = express.Router();
 
 router.post('/register', register);
@@ -43,6 +50,14 @@ router.delete('/poids-historique/:id', authenticateToken, supprimerPoidsHistoriq
 router.get('/records1RM', authenticateToken, getRecords1RM);
 
 router.put('/attribut', authenticateToken, updateUserField);
+
+router.post('/repas', authenticateToken, creerRepas);
+router.get('/repas', authenticateToken, getRepasUtilisateur);
+router.delete('/repas/:id', authenticateToken, supprimerRepas)
+router.get('/jour/:date', authenticateToken, getJournee);
+router.post('/jour', authenticateToken, upsertJournee);
+router.get("/journees/semaine/:annee/:semaine", authenticateToken, getJourneesDeSemaine);
+
 
 export default router;
 

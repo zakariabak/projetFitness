@@ -4,6 +4,7 @@ import http from 'http';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { seedExercices } from './data/exercices';
+import cors from 'cors';
 dotenv.config()
 
 seedExercices();
@@ -13,7 +14,16 @@ const MONGO_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fit4life
 
 
 
+
+
 const app = express();
+
+
+app.use(cors({
+  origin: 'http://localhost:8080',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(express.json({ limit: '4mb' }));
 
