@@ -9,15 +9,15 @@ interface IRepas {
 }
 
 export interface IJourneeNutrition extends Document {
-  userId: mongoose.Types.ObjectId;
-  date: string; // format YYYY-MM-DD
-  caloriesBrulees: number;
-  repas: IRepas[];
+  userId: mongoose.Types.ObjectId; // référence utilisateur
+  date: string; // date au format YYYY-MM-DD
+  caloriesBrulees: number; // calories brûlées ce jour
+  repas: IRepas[]; // liste des repas
 
-objectifCalories: number;
-objectifProteines: number;
-objectifGlucides: number;
-objectifLipides: number;
+  objectifCalories: number; // objectifs nutritionnels
+  objectifProteines: number;
+  objectifGlucides: number;
+  objectifLipides: number;
 }
 
 const JourneeSchema = new Schema<IJourneeNutrition>({
@@ -33,12 +33,13 @@ const JourneeSchema = new Schema<IJourneeNutrition>({
       lipides: { type: Number, required: true },
     }
   ],
-    objectifCalories: { type: Number, required: true },
-    objectifProteines: { type: Number, required: true },
-    objectifGlucides: { type: Number, required: true },
-    objectifLipides: { type: Number, required: true },
+  objectifCalories: { type: Number, required: true },
+  objectifProteines: { type: Number, required: true },
+  objectifGlucides: { type: Number, required: true },
+  objectifLipides: { type: Number, required: true },
 });
 
+// Index unique pour empêcher doublon user/date
 JourneeSchema.index({ userId: 1, date: 1 }, { unique: true });
 
 export default mongoose.model<IJourneeNutrition>('JourneeNutrition', JourneeSchema);

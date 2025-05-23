@@ -3,12 +3,13 @@ import mongoose from 'mongoose';
 import RepasPerso from '../models/RepasPerso';
 
 interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string }; // utilisateur connecté
 }
 
-
+// récupère tous les repas personnalisés d'un utilisateur
 export const getRepasUtilisateur = async (req: AuthRequest, res: Response): Promise<void> => {
   if (!req.user?.id) {
+    // vérifie authentification
     res.status(401).json({ message: "Utilisateur non authentifié" });
     return;
   }
@@ -22,6 +23,7 @@ export const getRepasUtilisateur = async (req: AuthRequest, res: Response): Prom
   }
 };
 
+// supprime un repas personnalisé par son id et userId
 export const supprimerRepas = async (req: AuthRequest, res: Response): Promise<void> => {
   const { id } = req.params;
 
@@ -48,7 +50,7 @@ export const supprimerRepas = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-
+// création d'un nouveau repas personnalisé
 export const creerRepas = async (
   req: AuthRequest,
   res: Response,
@@ -62,13 +64,14 @@ export const creerRepas = async (
   }
 
   if (!nom || calories == null || proteines == null || glucides == null || lipides == null) {
+    // vérifie présence de tous les champs obligatoires
     res.status(400).json({ message: 'Champs requis manquants' });
     return;
   }
 
   try {
     const repas = new RepasPerso({
-      userId: new mongoose.Types.ObjectId(req.user.id),
+      userId: new mongoose.Types.ObjectId(req.user.id), // conversion id mongoose
       nom,
       calories,
       proteines,
@@ -77,7 +80,7 @@ export const creerRepas = async (
     });
 
     const saved = await repas.save();
-    res.status(201).json({ message: '✅ Repas enregistré', repas: saved });
+    res.status(201).json({ message: 'Repas enregistré', repas: saved });
   } catch (error) {
     console.error("Erreur dans creerRepas :", error);
     res.status(500).json({ message: 'Erreur serveur', error });

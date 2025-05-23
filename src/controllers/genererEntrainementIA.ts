@@ -16,24 +16,26 @@ interface GeminiResponse {
 }
 
 interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string }; // user connecté
 }
 
+// nettoie la valeur répétitions pour toujours retourner un nombre
 function nettoyerRepetitions(rep: any): number {
   if (typeof rep === 'number') return rep;
   if (typeof rep === 'string') {
     const texte = rep.toLowerCase();
-    if (texte.includes('amrap') || texte.includes('maxrep')) return 10;
-    if (texte.includes('seconde')) return 10;
+    if (texte.includes('amrap') || texte.includes('maxrep')) return 10; // valeur par défaut max reps
+    if (texte.includes('seconde')) return 10; // si durée, on met 10 reps
 
     const match = texte.match(/\d+/);
     if (match) return parseInt(match[0], 10);
   }
-  return 10;
+  return 10; // défaut si pas reconnu
 }
 
 export const genererEntrainementIA = async (req: AuthRequest, res: Response): Promise<void> => {
   if (!GEMINI_API_KEY) {
+    // clé API manquante
     res.status(500).json({ error: "Clé API manquante" });
     return;
   }
@@ -41,6 +43,7 @@ export const genererEntrainementIA = async (req: AuthRequest, res: Response): Pr
   try {
     const utilisateur = await User.findById(req.user?.id);
     if (!utilisateur || !utilisateur.entrainement) {
+      // user ou type d'entrainement absent
       res.status(400).json({ error: "Utilisateur ou type d'entraînement non défini" });
       return;
     }
@@ -49,6 +52,7 @@ export const genererEntrainementIA = async (req: AuthRequest, res: Response): Pr
     const exosDispo = await Exercice.find({});
     const noms = exosDispo.map(e => e.nom);
 
+    // prompt envoyé à l'IA, liste les exos dispo et demande un programme adapté
     const prompt = `
 Tu es un coach sportif IA. Voici une liste d’exercices disponibles :
 ${noms.join(", ")}
@@ -78,6 +82,7 @@ Réponds uniquement avec du JSON, dans un bloc \`\`\`json.
       contents: [{ parts: [{ text: prompt }] }]
     };
 
+    // appel API Gemini pour générer contenu
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -102,6 +107,7 @@ Réponds uniquement avec du JSON, dans un bloc \`\`\`json.
     let jsonText: string | null = null;
 
     try {
+      // extraction bloc JSON dans la réponse
       jsonText = rawText.match(/```json\s*([\s\S]*?)\s*```/)?.[1]?.trim() ?? null;
       if (!jsonText) throw new Error("Bloc JSON non trouvé");
 
@@ -119,19 +125,22 @@ Réponds uniquement avec du JSON, dans un bloc \`\`\`json.
     const isRoutineObj = typeof parsed === "object" && !Array.isArray(parsed);
 
     if (isRoutineObj) {
+      // programme multi-jours
       const jours = Object.entries(parsed)
         .filter(([_, exercices]) => Array.isArray(exercices) && exercices.length > 0)
         .map(([jour, exercices]: [string, any[]], i) => ({
           nom: `Jour ${i + 1} ${type} IA`,
           exercices: exercices.map(ex => ({
             ...ex,
-            repetitions: nettoyerRepetitions(ex.repetitions)
+            repetitions: nettoyerRepetitions(ex.repetitions) // normalisation reps
           }))
         }));
 
       console.log(" Programme multi-jours structuré :", jours);
       res.status(200).json({ entrainements: jours });
+
     } else if (Array.isArray(parsed)) {
+      // programme simple
       const entrainement = parsed.map(ex => ({
         ...ex,
         repetitions: nettoyerRepetitions(ex.repetitions)
@@ -141,6 +150,7 @@ Réponds uniquement avec du JSON, dans un bloc \`\`\`json.
       res.status(200).json({
         entrainements: [{ nom: `${type} IA`, exercices: entrainement }]
       });
+
     } else {
       res.status(400).json({ error: "Format de programme inattendu" });
     }
@@ -150,5 +160,3 @@ Réponds uniquement avec du JSON, dans un bloc \`\`\`json.
     res.status(500).json({ error: "Erreur serveur lors de la génération IA" });
   }
 };
-
-

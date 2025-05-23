@@ -17,47 +17,52 @@ import { getProgressionParExercice } from '../controllers/getProgressionParExerc
 import { modifierEntrainement } from '../controllers/modifierEntrainement';
 import { getRecords1RM } from '../controllers/getRecords1RM';
 import { genererEntrainementIA } from '../controllers/genererEntrainementIA';
-import { creerRepas } from '../controllers/repasController';
-import { getRepasUtilisateur } from '../controllers/repasController';
-import { supprimerRepas } from '../controllers/repasController';
-import { getJournee, upsertJournee } from '../controllers/journeeController'
-import { getJourneesDeSemaine } from "../controllers/journeeController";
-
+import { creerRepas, getRepasUtilisateur, supprimerRepas } from '../controllers/repasController';
+import { getJournee, upsertJournee, getJourneesDeSemaine } from '../controllers/journeeController';
 
 const router = express.Router();
 
+// Routes publiques (sans auth)
 router.post('/register', register);
 router.post('/login', login);
-router.put('/evaluation/:id', evaluationUser);
-router.post('/suivi', authenticateToken, enregistrerSuivi);
-
-
 router.get('/all', getAllUsers);
-router.get('/suivi', authenticateToken, getSuivisUser);
-router.get('/exercices', getAllExercices); 
-router.delete('/suivi/:id', authenticateToken, deleteSuivi);
-router.put('/suivi/modifier', authenticateToken, updateUserField);
+router.get('/exercices', getAllExercices);
 
-router.post('/generer-entrainement',authenticateToken, genererEntrainementIA);
+// Routes nécessitant un token JWT valide (authentification)
+router.use(authenticateToken);
 
-// Routes protégées par token
-router.post('/entrainement', authenticateToken, creerEntrainement);
-router.get('/entrainement', authenticateToken, getEntrainementUser);
-router.put('/entrainement/:id', authenticateToken, modifierEntrainement);
-router.delete('/entrainement/:id', authenticateToken, deleteEntrainement);
-router.get('/suivi/performance/:nomExercice', authenticateToken, getProgressionParExercice);
-router.delete('/poids-historique/:id', authenticateToken, supprimerPoidsHistorique);
-router.get('/records1RM', authenticateToken, getRecords1RM);
+// Gestion utilisateur
+router.put('/evaluation/:id', evaluationUser);
+router.put('/attribut', updateUserField);
 
-router.put('/attribut', authenticateToken, updateUserField);
+// Gestion entraînements
+router.post('/entrainement', creerEntrainement);
+router.get('/entrainement', getEntrainementUser);
+router.put('/entrainement/:id', modifierEntrainement);
+router.delete('/entrainement/:id', deleteEntrainement);
 
-router.post('/repas', authenticateToken, creerRepas);
-router.get('/repas', authenticateToken, getRepasUtilisateur);
-router.delete('/repas/:id', authenticateToken, supprimerRepas)
-router.get('/jour/:date', authenticateToken, getJournee);
-router.post('/jour', authenticateToken, upsertJournee);
-router.get("/journees/semaine/:annee/:semaine", authenticateToken, getJourneesDeSemaine);
+// Gestion suivis musculation
+router.post('/suivi', enregistrerSuivi);
+router.get('/suivi', getSuivisUser);
+router.delete('/suivi/:id', deleteSuivi);
+router.get('/suivi/performance/:nomExercice', getProgressionParExercice);
+router.put('/suivi/modifier', updateUserField);
 
+// Records et IA
+router.get('/records1RM', getRecords1RM);
+router.post('/generer-entrainement', genererEntrainementIA);
+
+// Gestion poids historique
+router.delete('/poids-historique/:id', supprimerPoidsHistorique);
+
+// Gestion repas personnalisés
+router.post('/repas', creerRepas);
+router.get('/repas', getRepasUtilisateur);
+router.delete('/repas/:id', supprimerRepas);
+
+// Gestion journées nutrition
+router.get('/jour/:date', getJournee);
+router.post('/jour', upsertJournee);
+router.get('/journees/semaine/:annee/:semaine', getJourneesDeSemaine);
 
 export default router;
-

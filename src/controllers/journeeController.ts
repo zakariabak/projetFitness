@@ -4,8 +4,6 @@ import User from '../models/User';
 import { getUserStatsAtDate } from '../models/utilitaires/getUserStatsAtDate';
 import { startOfWeek, addDays, format } from 'date-fns';
 
-
-
 interface IRepas {
   nom: string;
   calories: number;
@@ -23,8 +21,7 @@ interface AuthRequest extends Request {
   };
 }
 
-// ✅ GET /user/jour/:date
-
+// GET /user/jour/:date - récupère la journée nutrition pour un utilisateur à une date donnée
 export const getJournee = async (req: AuthRequest, res: Response): Promise<void> => {
   const { date } = req.params;
   const userId = req.user?.id;
@@ -33,6 +30,7 @@ export const getJournee = async (req: AuthRequest, res: Response): Promise<void>
     let journee = await JourneeNutrition.findOne({ userId, date });
 
     if (!journee) {
+      // si aucune journée existante, initialise avec objectifs calculés
       const user = await User.findById(userId);
       if (!user) {
         res.status(404).json({ message: "Utilisateur introuvable." });
@@ -40,7 +38,6 @@ export const getJournee = async (req: AuthRequest, res: Response): Promise<void>
       }
 
       const caloriesBrulees = 0;
-
       const stats = getUserStatsAtDate(user, date);
       journee = await JourneeNutrition.create({
         userId,
@@ -53,18 +50,17 @@ export const getJournee = async (req: AuthRequest, res: Response): Promise<void>
         objectifLipides: stats.lipides
       });
 
-      console.log("🆕 Journée initialisée automatiquement :", journee);
+      console.log("Journée initialisée automatiquement :", journee);
     }
 
     res.status(200).json({ journee });
   } catch (err) {
-    console.error("❌ Erreur dans getJournee :", err);
+    console.error("Erreur dans getJournee :", err);
     res.status(500).json({ message: 'Erreur serveur', error: err });
   }
 };
 
-
-// ✅ POST /user/jour
+// POST /user/jour - crée ou met à jour une journée nutrition
 export const upsertJournee = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.id;
   const { date, caloriesBrulees, repas } = req.body;
@@ -74,14 +70,7 @@ export const upsertJournee = async (req: AuthRequest, res: Response): Promise<vo
     return;
   }
 
-
-
-   console.log(`📥 [POST] Requête reçue :`);
-  console.log(`    ➤ Utilisateur: ${userId}`);
-  console.log(`    ➤ Date: ${date}`);
-  console.log(`    ➤ Calories brûlées: ${caloriesBrulees}`);
-  console.log(`    ➤ Repas reçus:`, repas);
-
+  console.log("Requête POST reçue :", { userId, date, caloriesBrulees, repas });
 
   try {
     const user = await User.findById(userId);
@@ -90,8 +79,9 @@ export const upsertJournee = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
-    const stats = getUserStatsAtDate(user, date); // ⚡️ objectifs à la date
+    const stats = getUserStatsAtDate(user, date);
 
+    // mise à jour ou insertion de la journée avec objectifs recalculés
     const journee = await JourneeNutrition.findOneAndUpdate(
       { userId, date },
       {
@@ -112,8 +102,9 @@ export const upsertJournee = async (req: AuthRequest, res: Response): Promise<vo
     console.error("Erreur dans upsertJournee:", err);
     res.status(500).json({ message: "Erreur serveur", error: err });
   }
-}
+};
 
+// Fonction utilitaire pour obtenir les dates (YYYY-MM-DD) d'une semaine ISO donnée
 function getDatesOfISOWeek(week: number, year: number): string[] {
   const approximateDate = new Date(year, 0, 1 + (week - 1) * 7);
   const weekStart = startOfWeek(approximateDate, { weekStartsOn: 1 }); // lundi ISO
@@ -127,6 +118,7 @@ function getDatesOfISOWeek(week: number, year: number): string[] {
   return dates;
 }
 
+// GET journées nutrition d'une semaine spécifique pour l'utilisateur
 export const getJourneesDeSemaine = async (req: AuthRequest, res: Response): Promise<void> => {
   const userId = req.user?.id;
   const { annee, semaine } = req.params;
@@ -144,8 +136,10 @@ export const getJourneesDeSemaine = async (req: AuthRequest, res: Response): Pro
       date: { $in: dates }
     });
 
+    // création d'une map date => journée pour accès rapide
     const map = new Map(journees.map(j => [j.date, j]));
 
+    // préparation du résumé des macronutriments par jour
     const result = dates.map(date => {
       const jour = map.get(date);
       return {
@@ -161,4 +155,4 @@ export const getJourneesDeSemaine = async (req: AuthRequest, res: Response): Pro
     console.error("Erreur getJourneesDeSemaine :", err);
     res.status(500).json({ message: "Erreur serveur", error: err });
   }
-};;
+};

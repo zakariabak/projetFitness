@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
-import SuiviMusculation from '../models/SuiviMusculation'; // AJOUT
+import SuiviMusculation from '../models/SuiviMusculation'; // modèle suivi muscu
 import { IUser } from '../common/IUser';
 import {
   calculCalories,
@@ -12,39 +12,42 @@ import {
 } from '../models/utilitaires/calculs';
 
 interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string }; // ajout id user dans request
 }
 
 const allowedFields = [
   "nom", "nomFamille", "username", "email", "motDePasse", "poids", "taille",
   "sexe", "dispo", "objectif", "poidsObjectif", "experience", "entrainement",
   "frequence", "planNutrition", "budget", "age", "niveauActivite",
-];
+]; // champs modifiables
 
 const main1RMExercises = [
   "Développé couché à la barre",
   "Squat à la barre libre",
   "Soulevé de terre à la barre"
-];
+]; // exercices 1RM principaux
 
 export const updateUserField = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const { field, value, date } = req.body;
+  const { field, value, date } = req.body; // données reçues
 
   if (!req.user?.id) {
+    // check auth
     res.status(401).json({ message: 'Utilisateur non authentifié.' });
     return;
   }
 
   if (!field || typeof field !== 'string') {
+    // check validité champ
     res.status(400).json({ message: 'Champ invalide.' });
     return;
   }
 
   if (!allowedFields.includes(field)) {
+    // interdiction champs non autorisés
     res.status(400).json({ message: `Modification du champ '${field}' non autorisée.` });
     return;
   }
@@ -53,18 +56,21 @@ export const updateUserField = async (
     const user = await User.findById(req.user.id) as IUser;
 
     if (!user) {
+      // check user existe
       res.status(404).json({ message: 'Utilisateur non trouvé.' });
       return;
     }
 
-    user[field] = value;
+    user[field] = value; // mise à jour champ
 
     if (field === "poids") {
+      // si poids modifié, mise à jour historique
       let entryDate = date ? new Date(date) : new Date();
       const dateStr = entryDate.toISOString().split('T')[0];
 
       if (!user.poidsHistorique) user.poidsHistorique = [];
 
+      // suppression éventuelle d'une entrée du même jour
       user.poidsHistorique = user.poidsHistorique.filter(entry => {
         const entryDateStr = new Date(entry.date).toISOString().split('T')[0];
         return entryDateStr !== dateStr;
@@ -75,6 +81,7 @@ export const updateUserField = async (
         date: entryDate
       });
 
+      // trouve entrée la plus récente
       let mostRecentEntry = user.poidsHistorique[0];
       user.poidsHistorique.forEach(entry => {
         if (new Date(entry.date) > new Date(mostRecentEntry.date)) {
@@ -82,8 +89,9 @@ export const updateUserField = async (
         }
       });
 
-      user.poids = mostRecentEntry.poids;
+      user.poids = mostRecentEntry.poids; // poids à jour
 
+      // recalcul des macros si données complètes
       if (
         user.taille &&
         user.age &&
@@ -101,11 +109,13 @@ export const updateUserField = async (
         user.lipides = lipides;
         user.glucides = glucides;
       }
+      // trie historique par date croissante
       user.poidsHistorique.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     }
 
     let projection = null;
     const objectifNum = Number(user.poidsObjectif);
+    // estimation date objectif si possible
     if (
       user.poidsHistorique &&
       Array.isArray(user.poidsHistorique) &&
@@ -115,9 +125,10 @@ export const updateUserField = async (
       projection = estimationDateObjectif(user.poidsHistorique, objectifNum);
     }
 
-    
+    // récupère suivis musculation user
     const suivis = await SuiviMusculation.find({ userId: user._id });
 
+    // calcule records 1RM
     const records1RM: Record<string, { record: number | null; last: number | null }> = {};
     main1RMExercises.forEach(nom => {
       records1RM[nom] = {
@@ -126,8 +137,9 @@ export const updateUserField = async (
       };
     });
 
-    await user.save();
+    await user.save(); // sauvegarde user
 
+    // construit objet user renvoyé
     const userObj = {
       _id: user._id,
       nom: user.nom,

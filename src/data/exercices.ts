@@ -6,7 +6,6 @@ export async function seedExercices() {
 
     await Exercice.insertMany([
       // Pectoraux
-      // Pectoraux
 { nom: 'Développé couché à la barre', groupeMusculaire: 'Pectoraux' },
 { nom: 'Développé couché aux haltères', groupeMusculaire: 'Pectoraux' },
 { nom: 'Développé incliné à la barre', groupeMusculaire: 'Pectoraux' },

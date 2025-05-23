@@ -5,7 +5,9 @@ import { estimationDateObjectif } from '../models/utilitaires/calculs';
 
 export const login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { email, motDePasse } = req.body;
+
   if (!email || !motDePasse) {
+    // vérifie que email et mot de passe sont fournis
     res.status(400).json({ message: 'Email et mot de passe sont requis' });
     return;
   }
@@ -13,20 +15,24 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
   try {
     const user = await User.findOne({ email });
     if (!user) {
+      // utilisateur existe ?
       res.status(404).json({ message: 'Utilisateur non trouvé' });
       return;
     }
     if (user.motDePasse !== motDePasse) {
+      // mot de passe correct ?
       res.status(401).json({ message: 'Mot de passe incorrect' });
       return;
     }
 
+    // création du token JWT valide 24h
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET!,
       { expiresIn: '24h' }
     );
 
+    // calcul projection date objectif si données dispo
     let projection = null;
     if (user.poidsHistorique && user.poidsObjectif) {
       projection = estimationDateObjectif(
@@ -35,7 +41,7 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       );
     }
 
-    
+    // prépare objet user renvoyé côté client
     const userObj = {
       _id: user._id,
       nom: user.nom,
@@ -59,18 +65,18 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
       glucides: user.glucides,
       imc: user.imc,
       poidsHistorique: user.poidsHistorique || [],
-    
+
       dateEstimeeObjectif: projection?.dateEstimee || null,
       pentePoids: projection?.details?.a ?? null,
       nbJoursRestant: projection?.details?.xObjectif ?? null
     };
 
-    console.log("🔐 TOKEN DEV :", token);
+    console.log("TOKEN DEV :", token);
 
     res.status(200).json({
       message: 'Connexion réussie',
       token,
-      user: userObj 
+      user: userObj
     });
 
   } catch (error) {

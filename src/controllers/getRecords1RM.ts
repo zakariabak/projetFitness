@@ -6,21 +6,24 @@ const main1RMExercises = [
   "Développé couché à la barre",
   "Squat à la barre libre",
   "Soulevé de terre à la barre"
-];
+]; // exercices ciblés 1RM
 
 interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: string }; // user connecté
 }
 
 export const getRecords1RM = async (req: AuthRequest, res: Response): Promise<void> => {
   if (!req.user?.id) {
+    // check auth
     res.status(401).json({ message: "Non authentifié" });
     return;
   }
 
   try {
+    // récupère tous les suivis user
     const suivis = await SuiviMusculation.find({ userId: req.user.id });
 
+    // calcule records absolu et dernier 1RM par exercice
     const records1RM: Record<string, { record: number | null, last: number | null }> = {};
     main1RMExercises.forEach(nom => {
       records1RM[nom] = {
